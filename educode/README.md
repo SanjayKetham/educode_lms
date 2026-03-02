@@ -17,44 +17,6 @@ A complete LMS platform built with **React + Node.js + Express + MongoDB**.
 
 ---
 
-## 📁 Project Structure
-
-```
-educode/
-├── server/              # Express API
-│   ├── models/          # Mongoose schemas
-│   │   ├── User.js
-│   │   ├── Course.js
-│   │   ├── Question.js
-│   │   ├── Assessment.js
-│   │   └── CollegeTest.js
-│   ├── routes/          # API routes
-│   │   ├── auth.js
-│   │   ├── courses.js
-│   │   ├── questions.js
-│   │   ├── assessments.js
-│   │   ├── tests.js
-│   │   ├── users.js
-│   │   ├── compiler.js
-│   │   └── leaderboard.js
-│   ├── middleware/
-│   │   └── auth.js      # JWT protect + authorize
-│   ├── seed.js          # Database seeder
-│   └── index.js         # Server entry
-│
-└── client/              # React app
-    └── src/
-        ├── context/     # AuthContext
-        ├── utils/       # Axios instance
-        ├── components/  # Shared UI + Layout
-        └── pages/
-            ├── student/ # Dashboard, Courses, Compiler, Problems, Assessments, Test, Leaderboard
-            ├── admin/   # Dashboard, Courses, Questions, Assessments, Tests, Students
-            └── college/ # College test portal
-```
-
----
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -74,12 +36,6 @@ cd server
 cp .env.example .env
 # Edit .env with your MongoDB URI and JWT secret
 ```
-
-### 3. Seed Database
-```bash
-cd server
-npm run seed
-```
 Creates demo accounts + sample courses, questions, assessments.
 
 ### 4. Run Development
@@ -90,18 +46,6 @@ npm run dev
 cd server && npm run dev    # http://localhost:5000
 cd client && npm start      # http://localhost:3000
 ```
-
----
-
-## 👤 Demo Accounts
-
-| Role    | Email                      | Password    |
-|---------|---------------------------|-------------|
-| Admin   | admin@educode.com          | admin123    |
-| Student | student@educode.com        | student123  |
-| College | college@abc.edu            | college123  |
-
----
 
 ## ✨ Features
 
@@ -128,27 +72,7 @@ cd client && npm start      # http://localhost:3000
 - ▶️ **Go Live / End Test** — Real-time test control
 - 📈 **Results** — Student scores and rankings
 
----
 
-## 🔌 API Endpoints
-
-| Method | Endpoint                        | Description                  |
-|--------|---------------------------------|------------------------------|
-| POST   | /api/auth/register              | Register user                |
-| POST   | /api/auth/login                 | Login                        |
-| GET    | /api/auth/me                    | Get current user             |
-| GET    | /api/courses                    | List courses                 |
-| POST   | /api/courses/:id/enroll         | Enroll in course             |
-| GET    | /api/questions                  | List questions               |
-| POST   | /api/questions/:id/submit       | Submit coding solution       |
-| GET    | /api/assessments                | List assessments             |
-| POST   | /api/assessments/:id/submit     | Submit assessment            |
-| POST   | /api/tests/join                 | Join test by code            |
-| POST   | /api/tests/:id/submit           | Submit test                  |
-| POST   | /api/compiler/run               | Run code (simulated)         |
-| GET    | /api/leaderboard                | Get leaderboard              |
-
----
 
 ## 🔧 Production Notes
 
