@@ -22,6 +22,7 @@ const courseSchema = new mongoose.Schema({
   createdBy:   { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   isActive:    { type: Boolean, default: true },
   thumbnail:   { type: String, default: '' },
+  assessment:  { type: mongoose.Schema.Types.ObjectId, ref: 'Assessment' },
   tags:        [String],
 }, { timestamps: true });
 

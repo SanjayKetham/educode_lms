@@ -78,8 +78,12 @@ export default function CourseDetail() {
                 <Badge color="#00d4ff">{course.category}</Badge>
                 <Badge color="#64748b">{lesson.duration || 10} min</Badge>
               </div>
-              <Card style={{ marginBottom:20, lineHeight:1.8, fontSize:14, color:'#94a3b8', whiteSpace:'pre-wrap' }}>
-                {lesson.content || `Welcome to the lesson: ${lesson.title}\n\nThis lesson covers fundamental concepts in ${course.category}. Content can be added by admin via the admin panel.\n\nKey topics:\n• Understanding core concepts\n• Practical examples\n• Hands-on exercises\n• Practice problems`}
+              <Card style={{ marginBottom:20 }}>
+                <div 
+                  className="quill-content"
+                  style={{ lineHeight:1.8, fontSize:14, color:'#94a3b8', whiteSpace:'pre-wrap' }}
+                  dangerouslySetInnerHTML={{ __html: lesson.content || `Welcome to the lesson: ${lesson.title}\n\nThis lesson covers fundamental concepts in ${course.category}. Content can be added by admin via the admin panel.\n\nKey topics:\n• Understanding core concepts\n• Practical examples\n• Hands-on exercises\n• Practice problems` }} 
+                />
               </Card>
               {lesson.videoUrl && (
                 <Card style={{ marginBottom:20 }}>
@@ -89,7 +93,11 @@ export default function CourseDetail() {
               <div style={{ display:'flex', gap:12 }}>
                 {activeLesson > 0 && <Btn variant="outline" onClick={() => setActiveLesson(activeLesson-1)}>← Previous</Btn>}
                 {!completedLessons.includes(activeLesson) && <Btn variant="success" onClick={() => markComplete(activeLesson)}>✓ Mark Complete</Btn>}
-                {activeLesson < (course.lessons?.length || 0) - 1 && <Btn variant="accent" onClick={() => setActiveLesson(activeLesson+1)}>Next Lesson →</Btn>}
+                {activeLesson < (course.lessons?.length || 0) - 1 ? (
+                  <Btn variant="accent" onClick={() => setActiveLesson(activeLesson+1)}>Next Lesson →</Btn>
+                ) : course.assessment ? (
+                  <Btn variant="primary" onClick={() => navigate(`/assessments/${course.assessment._id}/take`)}>Take Course Assessment</Btn>
+                ) : null}
               </div>
             </>
           ) : (

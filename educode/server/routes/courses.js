@@ -22,7 +22,9 @@ router.get('/', protect, async (req, res) => {
 // @GET /api/courses/:id - Get single course with lessons
 router.get('/:id', protect, async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id).populate('createdBy', 'name');
+    const course = await Course.findById(req.params.id)
+      .populate('createdBy', 'name')
+      .populate('assessment', 'title');
     if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
     const isEnrolled = req.user.enrolledCourses.includes(course._id);
     const progress = req.user.courseProgress.find(p => p.course.toString() === course._id.toString());
@@ -66,6 +68,65 @@ router.put('/:id/progress', protect, async (req, res) => {
     progressEntry.progress = Math.round((progressEntry.completedLessons.length / course.totalLessons) * 100);
     await user.save();
     res.json({ success: true, progress: progressEntry.progress });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// @POST /api/courses/:id/lessons - Add lesson to a course (admin only)
+router.post('/:id/lessons', protect, authorize('admin'), async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+    
+    const newLesson = {
+      ...req.body,
+      order: course.lessons.length + 1
+    };
+    
+    course.lessons.push(newLesson);
+    await course.save(); // This will also update totalLessons due to the pre-save hook
+    
+    res.json({ success: true, course });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// @PUT /api/courses/:id/lessons/:lessonId - Update a specific lesson (admin only)
+router.put('/:id/lessons/:lessonId', protect, authorize('admin'), async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+    
+    const lesson = course.lessons.id(req.params.lessonId);
+    if (!lesson) return res.status(404).json({ success: false, message: 'Lesson not found' });
+    
+    // Update fields
+    if (req.body.title) lesson.title = req.body.title;
+    if (req.body.content !== undefined) lesson.content = req.body.content;
+    if (req.body.videoUrl !== undefined) lesson.videoUrl = req.body.videoUrl;
+    if (req.body.duration !== undefined) lesson.duration = req.body.duration;
+    
+    await course.save();
+    res.json({ success: true, course });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// @DELETE /api/courses/:id/lessons/:lessonId - Delete a specific lesson (admin only)
+router.delete('/:id/lessons/:lessonId', protect, authorize('admin'), async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+    
+    // Remove lesson and re-order
+    course.lessons.pull({ _id: req.params.lessonId });
+    course.lessons.forEach((l, i) => { l.order = i + 1; });
+    
+    await course.save();
+    res.json({ success: true, course });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

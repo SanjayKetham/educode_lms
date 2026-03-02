@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { PageHeader, Modal, Input, Select, Textarea, Btn, Badge } from '../../components/UI';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -6,13 +9,11 @@ import toast from 'react-hot-toast';
 const EMPTY = { title:'', description:'', category:'DSA', level:'Beginner', icon:'📚', color:'rgba(0,212,255,0.12)', lessons:[] };
 
 export default function AdminCourses() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [modal, setModal] = useState(false);
-  const [lessonModal, setLessonModal] = useState(false);
   const [form, setForm] = useState({...EMPTY});
-  const [lessonForm, setLessonForm] = useState({ title:'', content:'', duration:10, videoUrl:'' });
   const [editing, setEditing] = useState(null);
-  const [selectedCourse, setSelectedCourse] = useState(null);
 
   const load = () => api.get('/courses').then(r => setCourses(r.data.courses));
   useEffect(() => { load(); }, []);
@@ -33,14 +34,6 @@ export default function AdminCourses() {
   };
 
   const openEdit = (c) => { setForm({...EMPTY, ...c}); setEditing(c._id); setModal(true); };
-
-  const addLesson = async () => {
-    try {
-      const updatedLessons = [...(selectedCourse.lessons||[]), { ...lessonForm, order: (selectedCourse.lessons?.length||0)+1 }];
-      await api.put(`/courses/${selectedCourse._id}`, { lessons: updatedLessons });
-      toast.success('Lesson added!'); setLessonModal(false); setLessonForm({ title:'', content:'', duration:10, videoUrl:'' }); load();
-    } catch { toast.error('Error adding lesson'); }
-  };
 
   return (
     <div className="fade-in">
@@ -67,7 +60,7 @@ export default function AdminCourses() {
                   <td style={{ padding:'12px 16px' }}>
                     <div style={{ display:'flex', gap:6 }}>
                       <Btn variant="outline" style={{ padding:'5px 10px', fontSize:11 }} onClick={() => openEdit(c)}>Edit</Btn>
-                      <Btn variant="warn" style={{ padding:'5px 10px', fontSize:11 }} onClick={() => { setSelectedCourse(c); setLessonModal(true); }}>+ Lesson</Btn>
+                      <Btn variant="success" style={{ padding:'5px 10px', fontSize:11 }} onClick={() => navigate(`/admin/courses/${c._id}`)}>Manage</Btn>
                       <Btn variant="danger" style={{ padding:'5px 10px', fontSize:11 }} onClick={() => del(c._id)}>Del</Btn>
                     </div>
                   </td>
@@ -100,19 +93,6 @@ export default function AdminCourses() {
         </div>
       </Modal>
 
-      {/* Add Lesson Modal */}
-      <Modal open={lessonModal} onClose={() => setLessonModal(false)} title={`Add Lesson to "${selectedCourse?.title}"`}>
-        <Input label="Lesson Title" value={lessonForm.title} onChange={e => setLessonForm(f => ({...f, title:e.target.value}))} placeholder="e.g. Introduction to Arrays" />
-        <Textarea label="Content" value={lessonForm.content} onChange={e => setLessonForm(f => ({...f, content:e.target.value}))} placeholder="Lesson content..." style={{ minHeight:120 }} />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-          <Input label="Duration (minutes)" type="number" value={lessonForm.duration} onChange={e => setLessonForm(f => ({...f, duration:+e.target.value}))} />
-          <Input label="Video URL (optional)" value={lessonForm.videoUrl} onChange={e => setLessonForm(f => ({...f, videoUrl:e.target.value}))} placeholder="https://..." />
-        </div>
-        <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:8 }}>
-          <Btn variant="outline" onClick={() => setLessonModal(false)}>Cancel</Btn>
-          <Btn variant="success" onClick={addLesson}>Add Lesson</Btn>
-        </div>
-      </Modal>
     </div>
   );
 }

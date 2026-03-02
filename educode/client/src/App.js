@@ -25,6 +25,7 @@ import Leaderboard from './pages/student/Leaderboard';
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCourses from './pages/admin/AdminCourses';
+import AdminCourseDetail from './pages/admin/AdminCourseDetail';
 import AdminQuestions from './pages/admin/AdminQuestions';
 import AdminAssessments from './pages/admin/AdminAssessments';
 import AdminTests from './pages/admin/AdminTests';
@@ -67,6 +68,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<ProtectedRoute roles={['admin']}><AppLayout /></ProtectedRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="courses"     element={<AdminCourses />} />
+        <Route path="courses/:id" element={<AdminCourseDetail />} />
         <Route path="questions"   element={<AdminQuestions />} />
         <Route path="assessments" element={<AdminAssessments />} />
         <Route path="tests"       element={<AdminTests />} />
